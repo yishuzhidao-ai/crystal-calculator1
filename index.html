@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>润雅串珠 - 高级重量计算器</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
@@ -13,7 +13,7 @@
             font-family: 'Noto Sans SC', system-ui, sans-serif;
             background: linear-gradient(135deg, #fdfaf5, #f0e6d2);
             color: #3c2f2f;
-            padding: 30px 20px;
+            padding: 20px 10px;
         }
         
         .container {
@@ -28,31 +28,24 @@
         header {
             background: linear-gradient(90deg, #d4a17b, #e8c8a0);
             color: white;
-            padding: 35px 40px;
+            padding: 30px 20px;
             text-align: center;
         }
         
-        h1 { font-size: 2.4rem; }
-        p { opacity: 0.9; margin-top: 8px; }
+        h1 { font-size: 2rem; }
         
         .calc-body {
-            padding: 45px;
+            padding: 25px;
             display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 50px;
+            grid-template-columns: 1fr;
+            gap: 30px;
         }
         
-        .left {
-            border-right: 1px solid #eee;
-            padding-right: 40px;
+        @media (min-width: 768px) {
+            .calc-body { grid-template-columns: 380px 1fr; padding: 45px; gap: 50px; }
         }
         
-        .search-box {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        
-        #materialSearch {
+        .search-box input {
             width: 100%;
             padding: 16px 20px;
             font-size: 1.05rem;
@@ -61,7 +54,7 @@
         }
         
         .material-list {
-            max-height: 420px;
+            max-height: 380px;
             overflow-y: auto;
             border: 1px solid #eee;
             border-radius: 12px;
@@ -77,15 +70,8 @@
             background: #fff8eb;
         }
         
-        .input-group {
-            margin: 22px 0;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
+        .input-group { margin: 22px 0; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; }
         
         input[type="number"] {
             width: 100%;
@@ -104,43 +90,36 @@
             border-radius: 50px;
             font-size: 1.2rem;
             font-weight: 600;
-            margin-top: 15px;
             cursor: pointer;
         }
         
         .result-panel {
             background: #fdf8f0;
-            padding: 40px;
+            padding: 35px 20px;
             border-radius: 20px;
             text-align: center;
         }
         
         .result-value {
-            font-size: 3.4rem;
+            font-size: 2.8rem;
             font-weight: 700;
             color: #d4a17b;
-            margin: 12px 0;
         }
         
         .history {
-            margin-top: 35px;
+            margin-top: 30px;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 0.95rem;
         }
         
         th, td {
-            padding: 12px;
+            padding: 10px;
             text-align: left;
             border-bottom: 1px solid #eee;
-        }
-        
-        .density-info {
-            font-size: 0.9rem;
-            color: #777;
-            margin-top: 8px;
         }
     </style>
 </head>
@@ -152,12 +131,10 @@
         </header>
         
         <div class="calc-body">
-            <!-- 左侧输入 -->
-            <div class="left">
+            <div>
                 <div class="search-box">
                     <input type="text" id="materialSearch" placeholder="搜索材质（如：紫水晶、黄水晶...）" onkeyup="filterMaterials()">
                 </div>
-                
                 <div class="material-list" id="materialList"></div>
                 
                 <div class="input-group">
@@ -173,21 +150,16 @@
                 <button onclick="calculate()">开始计算</button>
             </div>
             
-            <!-- 右侧结果 -->
             <div>
                 <div class="result-panel">
-                    <h3>计算结果</h3>
-                    <div id="materialName" style="font-size:1.3rem; margin:15px 0; color:#666;">请选择材质</div>
-                    
+                    <h3 id="materialName">请选择材质</h3>
                     <div class="result-value" id="singleWeight">— g</div>
                     <p>单颗珠子重量</p>
                     
                     <div style="margin:30px 0; height:1px; background:#ddd;"></div>
                     
-                    <div class="result-value" id="totalWeight" style="font-size:3.8rem;">— g</div>
+                    <div class="result-value" id="totalWeight" style="font-size:3.4rem;">— g</div>
                     <p>整串总重量</p>
-                    
-                    <div class="density-info" id="densityInfo"></div>
                 </div>
                 
                 <div class="history">
@@ -202,154 +174,97 @@
     </div>
 
     <script>
-        // 材质数据库（含合理密度 g/cm³）
         let materials = [
-            {name: "白水晶", density: 2.65},
-            {name: "紫水晶", density: 2.65},
-            {name: "黄水晶", density: 2.65},
-            {name: "紫黄晶", density: 2.65},
-            {name: "茶晶", density: 2.65},
-            {name: "墨晶", density: 2.65},
-            {name: "普通粉晶", density: 2.65},
-            {name: "马粉", density: 2.65},
-            {name: "星光粉晶", density: 2.65},
-            {name: "金发晶", density: 2.65},
-            {name: "钛晶", density: 2.65},
-            {name: "黑发晶", density: 2.65},
-            {name: "银发晶", density: 2.65},
-            {name: "铜发晶", density: 2.65},
-            {name: "绿发晶", density: 2.65},
-            {name: "蓝发晶", density: 2.65},
-            {name: "彩发晶", density: 2.65},
-            {name: "红兔毛", density: 2.65},
-            {name: "白兔毛", density: 2.65},
-            {name: "金兔毛", density: 2.65},
-            {name: "绿兔毛", density: 2.65},
-            {name: "粉兔毛", density: 2.65},
-            {name: "彩兔毛", density: 2.65},
-            {name: "绿幽灵", density: 2.65},
-            {name: "红胶花", density: 2.58},
-            {name: "芬达胶花", density: 2.58},
-            {name: "超七", density: 2.65},
-            {name: "极光", density: 2.65},
-            {name: "紫锂辉", density: 3.1},
-            {name: "葡萄石", density: 2.9},
-            {name: "萤石", density: 3.18},
-            {name: "彩虹水晶", density: 2.65},
-            {name: "红玛瑙", density: 2.6},
-            {name: "黑玛瑙", density: 2.6},
-            {name: "白玛瑙", density: 2.6},
-            {name: "灰玛瑙", density: 2.6},
-            {name: "蓝纹玛瑙", density: 2.6},
-            {name: "花玛瑙", density: 2.6},
-            {name: "战国红", density: 2.6},
-            {name: "南红", density: 2.6},
-            {name: "盐源玛瑙", density: 2.6},
-            {name: "蓝玉髓", density: 2.58},
-            {name: "白玉髓", density: 2.58},
-            {name: "海洋玉髓", density: 2.58},
-            {name: "水草玛瑙", density: 2.6},
-            {name: "樱花玛瑙", density: 2.6},
-            {name: "白月光石", density: 2.56},
-            {name: "灰月光石", density: 2.56},
-            {name: "拉长石", density: 2.56},
-            {name: "太阳石", density: 2.65},
-            {name: "黄虎眼", density: 2.64},
-            {name: "红虎眼", density: 2.64},
-            {name: "蓝虎眼", density: 2.64},
-            {name: "彩虎眼", density: 2.64},
-            {name: "海蓝宝", density: 2.7},
-            {name: "蓝纹石", density: 2.7},
-            {name: "青金石", density: 2.4},
-            {name: "方钠石", density: 2.3},
-            {name: "绿东陵", density: 2.65},
-            {name: "蓝东陵", density: 2.65},
-            {name: "橄榄石", density: 3.3},
-            {name: "绿草莓晶", density: 2.65},
-            {name: "绿龙晶", density: 2.65},
-            {name: "草莓晶", density: 2.65},
-            {name: "红纹石", density: 2.9},
-            {name: "酒红石榴石", density: 3.8},
-            {name: "芬达石榴石", density: 3.8},
-            {name: "蔷薇辉石", density: 3.5},
-            {name: "彩虹碧玺", density: 3.1},
-            {name: "西瓜碧玺", density: 3.1},
-            {name: "黑曜石", density: 2.35},
-            {name: "金曜石", density: 2.35},
-            {name: "银曜石", density: 2.35},
-            {name: "彩曜石", density: 2.35},
-            {name: "冰彩黑曜石", density: 2.35},
-            {name: "黑碧玺", density: 3.0},
-            {name: "天河石", density: 2.56},
-            {name: "紫龙晶", density: 2.65},
-            {name: "舒俱来", density: 2.9},
-            {name: "方解石", density: 2.71},
-            {name: "堇青石", density: 2.58},
-            {name: "孔雀石", density: 3.6},
-            {name: "红碧玉", density: 2.65},
-            {name: "黄玉", density: 3.5},
-            {name: "托帕石", density: 3.5},
+            {name: "白水晶", density: 2.65}, {name: "紫水晶", density: 2.65},
+            {name: "黄水晶", density: 2.65}, {name: "紫黄晶", density: 2.65},
+            {name: "茶晶", density: 2.65}, {name: "墨晶", density: 2.65},
+            {name: "普通粉晶", density: 2.65}, {name: "马粉", density: 2.65},
+            {name: "星光粉晶", density: 2.65}, {name: "金发晶", density: 2.65},
+            {name: "钛晶", density: 2.65}, {name: "黑发晶", density: 2.65},
+            {name: "银发晶", density: 2.65}, {name: "铜发晶", density: 2.65},
+            {name: "绿发晶", density: 2.65}, {name: "蓝发晶", density: 2.65},
+            {name: "彩发晶", density: 2.65}, {name: "红兔毛", density: 2.65},
+            {name: "白兔毛", density: 2.65}, {name: "金兔毛", density: 2.65},
+            {name: "绿兔毛", density: 2.65}, {name: "粉兔毛", density: 2.65},
+            {name: "彩兔毛", density: 2.65}, {name: "绿幽灵", density: 2.65},
+            {name: "红胶花", density: 2.58}, {name: "芬达胶花", density: 2.58},
+            {name: "超七", density: 2.65}, {name: "极光", density: 2.65},
+            {name: "紫锂辉", density: 3.1}, {name: "葡萄石", density: 2.9},
+            {name: "萤石", density: 3.18}, {name: "彩虹水晶", density: 2.65},
+            {name: "红玛瑙", density: 2.6}, {name: "黑玛瑙", density: 2.6},
+            {name: "白玛瑙", density: 2.6}, {name: "灰玛瑙", density: 2.6},
+            {name: "蓝纹玛瑙", density: 2.6}, {name: "花玛瑙", density: 2.6},
+            {name: "战国红", density: 2.6}, {name: "南红", density: 2.6},
+            {name: "盐源玛瑙", density: 2.6}, {name: "蓝玉髓", density: 2.58},
+            {name: "白玉髓", density: 2.58}, {name: "海洋玉髓", density: 2.58},
+            {name: "水草玛瑙", density: 2.6}, {name: "樱花玛瑙", density: 2.6},
+            {name: "白月光石", density: 2.56}, {name: "灰月光石", density: 2.56},
+            {name: "拉长石", density: 2.56}, {name: "太阳石", density: 2.65},
+            {name: "黄虎眼", density: 2.64}, {name: "红虎眼", density: 2.64},
+            {name: "蓝虎眼", density: 2.64}, {name: "彩虎眼", density: 2.64},
+            {name: "海蓝宝", density: 2.7}, {name: "蓝纹石", density: 2.7},
+            {name: "青金石", density: 2.4}, {name: "方钠石", density: 2.3},
+            {name: "绿东陵", density: 2.65}, {name: "蓝东陵", density: 2.65},
+            {name: "橄榄石", density: 3.3}, {name: "绿草莓晶", density: 2.65},
+            {name: "绿龙晶", density: 2.65}, {name: "草莓晶", density: 2.65},
+            {name: "红纹石", density: 2.9}, {name: "酒红石榴石", density: 3.8},
+            {name: "芬达石榴石", density: 3.8}, {name: "蔷薇辉石", density: 3.5},
+            {name: "彩虹碧玺", density: 3.1}, {name: "西瓜碧玺", density: 3.1},
+            {name: "黑曜石", density: 2.35}, {name: "金曜石", density: 2.35},
+            {name: "银曜石", density: 2.35}, {name: "彩曜石", density: 2.35},
+            {name: "冰彩黑曜石", density: 2.35}, {name: "黑碧玺", density: 3.0},
+            {name: "天河石", density: 2.56}, {name: "紫龙晶", density: 2.65},
+            {name: "舒俱来", density: 2.9}, {name: "方解石", density: 2.71},
+            {name: "堇青石", density: 2.58}, {name: "孔雀石", density: 3.6},
+            {name: "红碧玉", density: 2.65}, {name: "黄玉", density: 3.5},
+            {name: "托帕石", density: 3.5}
         ];
         
         let currentMaterial = null;
         let history = [];
         
-        function renderMaterials(filteredMaterials) {
+        function renderMaterials(filtered) {
             const container = document.getElementById('materialList');
             container.innerHTML = '';
-            
-            filteredMaterials.forEach(mat => {
+            filtered.forEach(mat => {
                 const div = document.createElement('div');
                 div.className = 'material-item';
                 div.textContent = mat.name;
-                div.onclick = () => selectMaterial(mat);
+                div.onclick = () => selectMaterial(mat, div);
                 container.appendChild(div);
             });
         }
         
-        function selectMaterial(mat) {
+        function selectMaterial(mat, element) {
             currentMaterial = mat;
-            document.querySelectorAll('.material-item').forEach(el => {
-                el.classList.toggle('selected', el.textContent === mat.name);
-            });
+            document.querySelectorAll('.material-item').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
         }
         
         function filterMaterials() {
             const keyword = document.getElementById('materialSearch').value.toLowerCase().trim();
-            const filtered = materials.filter(m => 
-                m.name.toLowerCase().includes(keyword)
-            );
-            renderMaterials(filtered);
+            const filtered = materials.filter(m => m.name.toLowerCase().includes(keyword));
+            renderMaterials(filtered.length ? filtered : materials);
         }
         
         function calculate() {
-            if (!currentMaterial) {
-                alert("请先选择一种材质！");
-                return;
-            }
+            if (!currentMaterial) return alert("请先选择一种材质！");
             
             const diameter = parseFloat(document.getElementById('diameter').value);
             const count = parseInt(document.getElementById('count').value);
             
-            if (!diameter || !count) {
-                alert("请输入直径和数量！");
-                return;
-            }
+            if (!diameter || !count) return alert("请输入直径和数量！");
             
-            // 高精度计算
-            const radiusCM = diameter / 20; // mm → cm
+            const radiusCM = diameter / 20;
             const volume = (4 / 3) * Math.PI * Math.pow(radiusCM, 3);
             const singleWeight = (volume * currentMaterial.density).toFixed(3);
             const totalWeight = (singleWeight * count).toFixed(2);
             
-            // 显示结果
             document.getElementById('materialName').textContent = currentMaterial.name;
             document.getElementById('singleWeight').textContent = singleWeight + " g";
             document.getElementById('totalWeight').textContent = totalWeight + " g";
-            document.getElementById('densityInfo').textContent = 
-                `密度：${currentMaterial.density} g/cm³ | 体积公式估算`;
             
-            // 添加历史
+            // 添加历史记录
             history.unshift({
                 material: currentMaterial.name,
                 diameter: diameter,
@@ -357,7 +272,6 @@
                 single: singleWeight,
                 total: totalWeight
             });
-            
             if (history.length > 10) history.pop();
             renderHistory();
         }
@@ -365,7 +279,6 @@
         function renderHistory() {
             const tbody = document.querySelector('#historyTable tbody');
             tbody.innerHTML = '';
-            
             history.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -379,14 +292,8 @@
             });
         }
         
-        // 初始化
         window.onload = () => {
             renderMaterials(materials);
-            
-            // 默认选中第一个
-            setTimeout(() => {
-                selectMaterial(materials[0]);
-            }, 300);
         };
     </script>
 </body>
