@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>润雅串珠 - 高级重量计算器</title>
+    <title>润雅串珠 - 高级计算器</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
         
@@ -13,55 +13,56 @@
             font-family: 'Noto Sans SC', system-ui, sans-serif;
             background: linear-gradient(135deg, #fdfaf5, #f0e6d2);
             color: #3c2f2f;
-            padding: 20px 10px;
+            padding: 15px 10px;
         }
         
         .container {
             max-width: 1000px;
             margin: 0 auto;
             background: white;
-            border-radius: 28px;
-            box-shadow: 0 25px 70px rgba(0,0,0,0.15);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
             overflow: hidden;
         }
         
         header {
             background: linear-gradient(90deg, #d4a17b, #e8c8a0);
             color: white;
-            padding: 30px 20px;
+            padding: 25px 15px;
             text-align: center;
         }
         
-        h1 { font-size: 2rem; }
+        h1 { font-size: 1.9rem; }
         
         .calc-body {
-            padding: 25px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
         }
         
         @media (min-width: 768px) {
-            .calc-body { grid-template-columns: 380px 1fr; padding: 45px; gap: 50px; }
+            .calc-body { flex-direction: row; padding: 40px; gap: 40px; }
         }
         
         .search-box input {
             width: 100%;
-            padding: 16px 20px;
-            font-size: 1.05rem;
+            padding: 14px 16px;
             border: 2px solid #d4a17b;
-            border-radius: 16px;
+            border-radius: 14px;
+            font-size: 1.05rem;
         }
         
         .material-list {
-            max-height: 380px;
+            max-height: 260px;
             overflow-y: auto;
             border: 1px solid #eee;
             border-radius: 12px;
+            margin-bottom: 15px;
         }
         
         .material-item {
-            padding: 12px 18px;
+            padding: 12px 16px;
             cursor: pointer;
             border-bottom: 1px solid #f0f0f0;
         }
@@ -70,102 +71,99 @@
             background: #fff8eb;
         }
         
-        .input-group { margin: 22px 0; }
+        .input-group { margin: 18px 0; }
         label { display: block; margin-bottom: 8px; font-weight: 500; }
         
         input[type="number"] {
             width: 100%;
-            padding: 14px 16px;
+            padding: 14px;
             border: 2px solid #e8d8c4;
             border-radius: 12px;
-            font-size: 1.1rem;
         }
         
         button {
             width: 100%;
-            padding: 18px;
+            padding: 16px;
             background: #d4a17b;
             color: white;
             border: none;
             border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 1.15rem;
             cursor: pointer;
         }
         
         .result-panel {
             background: #fdf8f0;
-            padding: 35px 20px;
+            padding: 25px 20px;
             border-radius: 20px;
             text-align: center;
         }
         
         .result-value {
-            font-size: 2.8rem;
+            font-size: 2.6rem;
             font-weight: 700;
             color: #d4a17b;
         }
         
-        .history {
-            margin-top: 30px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.95rem;
-        }
-        
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
+        .history { margin-top: 25px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>润雅串珠高级计算器</h1>
-            <p>支持上百种水晶材质 · 高精度重量估算</p>
+            <h1>润雅串珠计算器</h1>
+            <p>重量 + 价格 一键计算</p>
         </header>
         
         <div class="calc-body">
             <div>
                 <div class="search-box">
-                    <input type="text" id="materialSearch" placeholder="搜索材质（如：紫水晶、黄水晶...）" onkeyup="filterMaterials()">
+                    <input type="text" id="materialSearch" placeholder="搜索并选择材质..." onkeyup="filterMaterials()">
                 </div>
                 <div class="material-list" id="materialList"></div>
                 
                 <div class="input-group">
                     <label>珠子直径 (mm)</label>
-                    <input type="number" id="diameter" value="8" step="0.1" min="2" max="20">
+                    <input type="number" id="diameter" value="8" step="0.1">
                 </div>
                 
                 <div class="input-group">
                     <label>珠子数量</label>
-                    <input type="number" id="count" value="16" min="1" max="99">
+                    <input type="number" id="count" value="16">
                 </div>
                 
-                <button onclick="calculate()">开始计算</button>
+                <div class="input-group">
+                    <label>单价 (元/克)</label>
+                    <input type="number" id="pricePerGram" value="8" step="0.5">
+                </div>
+                
+                <button onclick="calculate()">计算重量与价格</button>
             </div>
             
             <div>
                 <div class="result-panel">
                     <h3 id="materialName">请选择材质</h3>
                     <div class="result-value" id="singleWeight">— g</div>
-                    <p>单颗珠子重量</p>
+                    <p>单颗重量</p>
                     
-                    <div style="margin:30px 0; height:1px; background:#ddd;"></div>
+                    <div class="result-value" id="singlePrice" style="color:#e74c3c; margin:10px 0;">— 元</div>
+                    <p>单颗价格</p>
                     
-                    <div class="result-value" id="totalWeight" style="font-size:3.4rem;">— g</div>
+                    <div style="margin:20px 0; height:1px; background:#ddd;"></div>
+                    
+                    <div class="result-value" id="totalWeight">— g</div>
                     <p>整串总重量</p>
+                    
+                    <div class="result-value" id="totalPrice" style="color:#e74c3c;">— 元</div>
+                    <p>整串总价格</p>
                 </div>
                 
                 <div class="history">
                     <h3>历史记录</h3>
                     <table id="historyTable">
-                        <thead><tr><th>材质</th><th>直径</th><th>数量</th><th>单颗</th><th>总重</th></tr></thead>
+                        <thead><tr><th>材质</th><th>直径</th><th>数量</th><th>总重</th><th>总价</th></tr></thead>
                         <tbody></tbody>
                     </table>
                 </div>
@@ -237,8 +235,10 @@
         
         function selectMaterial(mat, element) {
             currentMaterial = mat;
+            document.getElementById('materialSearch').value = mat.name;
             document.querySelectorAll('.material-item').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
+            document.getElementById('materialList').style.maxHeight = '60px'; // 收起
         }
         
         function filterMaterials() {
@@ -252,27 +252,29 @@
             
             const diameter = parseFloat(document.getElementById('diameter').value);
             const count = parseInt(document.getElementById('count').value);
-            
-            if (!diameter || !count) return alert("请输入直径和数量！");
+            const pricePerGram = parseFloat(document.getElementById('pricePerGram').value) || 8;
             
             const radiusCM = diameter / 20;
             const volume = (4 / 3) * Math.PI * Math.pow(radiusCM, 3);
             const singleWeight = (volume * currentMaterial.density).toFixed(3);
             const totalWeight = (singleWeight * count).toFixed(2);
+            const singlePrice = (singleWeight * pricePerGram).toFixed(2);
+            const totalPrice = (totalWeight * pricePerGram).toFixed(1);
             
             document.getElementById('materialName').textContent = currentMaterial.name;
             document.getElementById('singleWeight').textContent = singleWeight + " g";
+            document.getElementById('singlePrice').textContent = singlePrice + " 元";
             document.getElementById('totalWeight').textContent = totalWeight + " g";
+            document.getElementById('totalPrice').textContent = totalPrice + " 元";
             
-            // 添加历史记录
             history.unshift({
                 material: currentMaterial.name,
                 diameter: diameter,
                 count: count,
-                single: singleWeight,
-                total: totalWeight
+                totalWeight: totalWeight,
+                totalPrice: totalPrice
             });
-            if (history.length > 10) history.pop();
+            if (history.length > 8) history.pop();
             renderHistory();
         }
         
@@ -284,9 +286,9 @@
                 tr.innerHTML = `
                     <td>${item.material}</td>
                     <td>${item.diameter}mm</td>
-                    <td>${item.count}颗</td>
-                    <td>${item.single}g</td>
-                    <td><strong>${item.total}g</strong></td>
+                    <td>${item.count}</td>
+                    <td>${item.totalWeight}g</td>
+                    <td>${item.totalPrice}元</td>
                 `;
                 tbody.appendChild(tr);
             });
